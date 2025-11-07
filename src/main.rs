@@ -15,7 +15,7 @@ fn main() {
 fn ignore_bloat(line: &str) -> bool {
     if let Ok(json) = serde_json::from_str::<Value>(line) {
         if let Some(msg) = json.get("msg").and_then(Value::as_str) {
-            return msg == "START" || msg == "END";
+            return msg == "START" || msg == "claims";
         }
     }
     false
