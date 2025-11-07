@@ -36,6 +36,10 @@ fn format_json_log(json: &Value) -> Option<String> {
         .and_then(Value::as_str)
         .unwrap_or("");
 
+    if msg == "START" || msg == "END" {
+        return None;
+    }
+
     // Extract key fields
     let method = json.get("method").and_then(Value::as_str);
     let path = json.get("path").and_then(Value::as_str);
