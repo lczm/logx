@@ -5,8 +5,20 @@ use std::io::{self, BufRead};
 fn main() {
     let stdin = io::stdin();
     for line in stdin.lock().lines().map_while(Result::ok) {
+        if ignore_bloat(&line) {
+            continue;
+        }
         println!("{}", format_line(&line));
     }
+}
+
+fn ignore_bloat(line: &str) -> bool {
+    if let Ok(json) = serde_json::from_str::<Value>(line) {
+        if let Some(msg) = json.get("msg").and_then(Value::as_str) {
+            return msg == "START" || msg == "END";
+        }
+    }
+    false
 }
 
 fn format_line(line: &str) -> String {
@@ -35,10 +47,6 @@ fn format_json_log(json: &Value) -> Option<String> {
         .or_else(|| json.get("message"))
         .and_then(Value::as_str)
         .unwrap_or("");
-
-    if msg == "START" || msg == "END" {
-        return None;
-    }
 
     // Extract key fields
     let method = json.get("method").and_then(Value::as_str);
